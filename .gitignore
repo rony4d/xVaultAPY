@@ -1,0 +1,12 @@
+/node_modules/
+/.idea/
+/secrets.json
+/scripts/
+# /migrations/
+/build/
+
+/accounts.json
+# /truffle-config.js
+.env
+run-ganache.sh
+/flattens
