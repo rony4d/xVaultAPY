@@ -1,5 +1,6 @@
 
 const Web3 = require('web3');
+const BigNumber = require('bignumber.js');
 
 // const { formatUnits } = require('@ethersproject/units');
 // const { Zero } = require('@ethersproject/constants');
@@ -20,15 +21,12 @@ const daysPerYear = 365;
 
 async function runCode() {
 
-
-    
     var vToken = new web3.eth.Contract(vUsdtAbi, vUsdtAddress);
     var supplyRatePerBlock = await vToken.methods.supplyRatePerBlock().call();
     var borrowRatePerBlock = await vToken.methods.borrowRatePerBlock().call();
-    var vTokenTotalSupply = await vToken.methods.totalSupply().call();
 
-    var supplyApy = (((Math.pow((supplyRatePerBlock / usdtMantissa * blocksPerDay) + 1, daysPerYear))) - 1) * 100;
-    var borrowApy = (((Math.pow((borrowRatePerBlock / usdtMantissa * blocksPerDay) + 1, daysPerYear))) - 1) * 100;
+    var supplyApy = new BigNumber(supplyRatePerBlock).div(new BigNumber(usdtMantissa)).times(blocksPerDay).plus(1).pow(daysPerYear).minus(1).times(100);
+    var borrowApy = new BigNumber(borrowRatePerBlock).div(new BigNumber(usdtMantissa)).times(blocksPerDay).plus(1).pow(daysPerYear).minus(1).times(100);
     
     var unitroller = new web3.eth.Contract(unitrollerAbi, unitrollerAddress);
     var venusSpeed = await unitroller.methods.venusSpeeds(vUsdtAddress).call();
@@ -36,14 +34,29 @@ async function runCode() {
     
     var path = ["0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63", "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", "0x55d398326f99059ff775485246999027b3197955"];
     var routerContract = new web3.eth.Contract(uniswapRouterAbi, uniswapRouterAddress);
-    var amountIn = venusPerYear*1e11;
-    var amounts = await routerContract.methods.getAmountsOut(amountIn.toString(), path).call();
-    var theAmount = amounts[amounts.length - 1];
-    // const vTokenTotalSupply = await vToken.methods.totalSupply().call();
-    var rewardApy = theAmount / vTokenTotalSupply;
+    var amountIn = new BigNumber(10).pow(18);
+    var amountOut = await routerContract.methods.getAmountsOut(amountIn, path).call();
+    var price = amountOut[amountOut.length - 1];
+    var theAmount = new BigNumber(price).times(venusPerYear);
+    var totalBorrows = await vToken.methods.totalBorrows().call();
+    var cash = await vToken.methods.getCash().call();
+    var totalReserves = await vToken.methods.totalReserves().call();
+
+    var totalSupply = new BigNumber(totalBorrows).plus(new BigNumber(cash)).minus(new BigNumber(totalReserves));
+    var supplyRewardApy = new BigNumber(theAmount).div(totalSupply).times(100);
+    var borrowRewardApy = new BigNumber(theAmount).div(totalBorrows).times(100);
+
+    var apy = 0;
     
-    var apy = (supplyApy + rewardApy) + 3 * (supplyApy + 2 * rewardApy - borrowApy);
-    console.log(apy);
+    extra_profit = supplyApy.plus(supplyRewardApy).plus(borrowRewardApy).minus(borrowApy);
+    console.log('extra_profit', extra_profit.toString(10));
+    if (extra_profit.toNumber() > 0) {
+        apy = supplyApy.plus(supplyRewardApy).plus(extra_profit.times(3));
+    } else {
+        apy = supplyApy.plus(supplyRewardApy);
+    }
+
+    console.log('APY:', apy.toString(10));
 
 }
 
