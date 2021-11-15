@@ -8,7 +8,12 @@ const vUsdtAbi = require('../abi/vUsdtAbi.json');
 const unitrollerAbi = require('../abi/unitrollerAbi.json');
 const uniswapRouterAbi = require('../abi/UniswapRouterAbi.json');
 
-const vUsdtAddress = "0xfd5840cd36d94d7229439859c0112a4185bc0255";
+// const vUsdtAddress = "0xfd5840cd36d94d7229439859c0112a4185bc0255";   //  vUSDT
+// const vUsdtAddress = "0xecA88125a5ADbe82614ffC12D0DB554E2e2867C8";   //  vUSDC
+const vUsdtAddress = "0x95c78222B3D6e262426483D42CfA53685A67Ab9D";      //  vBUSD
+// const vUsdtAddress = "0xA07c5b74C9B40447a954e1466938b865b6BBea36";      //  vBNB
+
+
 const unitrollerAddress = "0xfD36E2c2a6789Db23113685031d7F16329158384";
 const xvs = "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63";
 const uniswapRouterAddress = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
