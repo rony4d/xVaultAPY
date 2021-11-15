@@ -9,7 +9,13 @@ const alpacaConfigAbi = require('../abi/alpacaConfigAbi.json');
 const fairLaunch = require('../abi/fairLaunchAbi.json')
 const uniswapRouterAbi = require('../abi/UniswapRouterAbi.json');
 
-const ibUsdtAddress = "0x158Da805682BdC8ee32d52833aD41E74bb951E59";
+// const ibUsdtAddress = "0x158Da805682BdC8ee32d52833aD41E74bb951E59";
+// const poolID = 16;
+// const ibUsdtAddress = "0x7C9e73d4C71dae564d41F78d56439bB4ba87592f"; //  BUSD
+// const poolID = 3;
+const ibUsdtAddress = "0x3282d2a151ca00BfE7ed17Aa16E42880248CD3Cd"; //  TUSDT
+const poolID = 20;
+
 const fairLanuchAddress = "0xA625AB01B08ce023B2a342Dbb12a16f2C8489A8F";
 const xvs = "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63";
 const uniswapRouterAddress = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
@@ -19,6 +25,15 @@ const web3 = new Web3('https://bsc-dataseed.binance.org/');
 const usdtMantissa = 1e18;
 const blocksPerDay = 60 * 60 * 24 / 3;
 const daysPerYear = 365;
+
+// for busd, 
+// ibBusd = 0x7C9e73d4C71dae564d41F78d56439bB4ba87592f
+// poolId = 3
+
+// for tusd,
+// ibTusd = 0x3282d2a151ca00BfE7ed17Aa16E42880248CD3Cd
+// poolId = 20
+
 
 async function runCode() {
 
@@ -34,7 +49,7 @@ async function runCode() {
     var alpacaLendingApr = alpacaBorrowInterest.multipliedBy(alpacaVaultDebtVal).dividedBy(alpacaTotalToken).multipliedBy(new BigNumber(1).minus(performanceFee)).dividedBy(web3.utils.toWei('1'));
 
     var fairLanuchContract = new web3.eth.Contract(fairLaunch, fairLanuchAddress);
-    var poolInfo = await fairLanuchContract.methods.poolInfo(16).call()
+    var poolInfo = await fairLanuchContract.methods.poolInfo(poolID).call()
     var allocPoint = poolInfo.allocPoint;
     var alpacaPerBlock = await fairLanuchContract.methods.alpacaPerBlock().call();
     var totalAllocPoint = await fairLanuchContract.methods.totalAllocPoint().call();
