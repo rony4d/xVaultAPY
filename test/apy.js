@@ -2,8 +2,6 @@
 const Web3 = require('web3');
 const BigNumber = require('bignumber.js');
 
-// const { formatUnits } = require('@ethersproject/units');
-// const { Zero } = require('@ethersproject/constants');
 const vUsdtAbi = require('../abi/vUsdtAbi.json');
 const unitrollerAbi = require('../abi/unitrollerAbi.json');
 const uniswapRouterAbi = require('../abi/UniswapRouterAbi.json');
