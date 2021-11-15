@@ -6,7 +6,7 @@ const ibUsdtAbi = require('../abi/ibUsdtAbi.json');
 const alpacaConfigAbi = require('../abi/alpacaConfigAbi.json');
 
 
-const fairLaunch = require('./abis/fairLaunchAbi.json')
+const fairLaunch = require('../abi/fairLaunchAbi.json')
 const uniswapRouterAbi = require('../abi/UniswapRouterAbi.json');
 
 const ibUsdtAddress = "0x158Da805682BdC8ee32d52833aD41E74bb951E59";
@@ -50,7 +50,7 @@ async function runCode() {
 
     var totalApr = alpacaLendingApr.plus(1).multipliedBy(stakingApr.plus(1)).minus(1)
     var totalApy = totalApr.dividedBy(daysPerYear).plus(1).pow(daysPerYear).minus(1).multipliedBy(100)                  // apy = (1 + apr/n)^n - 1
-    console.log('totalApy:', totalApy.toString())
+    console.log('totalApy:', totalApy.toFixed(2).toString())
 
 }
 
