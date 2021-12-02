@@ -11,6 +11,10 @@ const uniswapRouterAbi = require('../abi/UniswapRouterAbi.json');
 const vUsdtAddress = "0x95c78222B3D6e262426483D42CfA53685A67Ab9D";      //  vBUSD
 // const vUsdtAddress = "0xA07c5b74C9B40447a954e1466938b865b6BBea36";      //  vBNB
 
+const usdtStrategyAddress = '0x4bA58C32b994164218BC6a8A76107dcE6d374e07'    // usdt
+// const usdtStrategyAddress = '0x16911E3d5354725349C355EA0d24Fc6845Aa13Eb'    // usdc
+// const usdtStrategyAddress = '0x964407337aA2b8D2aB96B596651Ba9F5F53c4035'    // busd
+
 
 const unitrollerAddress = "0xfD36E2c2a6789Db23113685031d7F16329158384";
 const xvs = "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63";
@@ -50,14 +54,11 @@ async function runCode() {
     var borrowRewardApy = new BigNumber(theAmount).div(totalBorrows).times(100);
 
     var apy = 0;
-    
-    extra_profit = supplyApy.plus(supplyRewardApy).plus(borrowRewardApy).minus(borrowApy);
-    console.log('extra_profit', extra_profit.toString(10));
-    if (extra_profit.toNumber() > 0) {
-        apy = supplyApy.plus(supplyRewardApy).plus(extra_profit.times(3));
-    } else {
-        apy = supplyApy.plus(supplyRewardApy);
-    }
+    var strategyContract = new web3.eth.Contract(strategyAbi, usdtStrategyAddress);
+    var collateral = await strategyContract.methods.collateralTarget().call();
+    var factor = new BigNumber(collateral).div(new BigNumber(web3.utils.toWei('1')).minus(collateral))
+    var apr = supplyApy.plus(supplyRewardApy).times(factor.plus('1')).minus(factor.times(borrowApy.minus(borrowRewardApy)));
+    apy = apr.dividedBy('100').dividedBy(daysPerYear).plus(1).pow(daysPerYear).minus(1).multipliedBy(100)                  // apy = (1 + apr/n)^n - 1
 
     console.log('APY:', apy.toString(10));
 
